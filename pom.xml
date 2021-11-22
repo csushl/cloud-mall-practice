@@ -10,6 +10,9 @@
     <version>1.0-SNAPSHOT</version>
     <modules>
         <module>cloud-mall-eureka-server</module>
+        <module>cloud-mall-user</module>
+        <module>cloud-mall-common</module>
+        <module>cloud-mall-zuul</module>
     </modules>
 
     <properties>
