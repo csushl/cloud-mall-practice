@@ -19,7 +19,13 @@ public enum ImoocMallExceptionEnum {
     CREATE_FAILED(10012, "创建失败"),
     DELETE_FAILED(10013, "删除失败"),
     MKDIR_FAILED(10014, "创建文件夹失败"),
-    UPLOAD_FAILED(10014, "上次失败"),
+    UPLOAD_FAILED(10015, "上次失败"),
+    NOT_SALE(10016, "商品未上架"),
+    NOT_ENOUGH(10017, "商品库存不足"),
+    CART_EMPTY(10018, "购物车为空"),
+    NO_ORDER(10019, "订单不存在"),
+    NOT_YOUR_ORDER(10020, "不能操作非自己的订单"),
+    WRONG_ORDER_STATUS(10021, "订单状态不符"),
     SYSTEM_ERROR(20000, "系统异常");
     /**
      * 异常码

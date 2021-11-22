@@ -14,6 +14,7 @@
         <module>cloud-mall-common</module>
         <module>cloud-mall-zuul</module>
         <module>cloud-mall-category-product</module>
+        <module>cloud-mall-cart-order</module>
     </modules>
 
     <properties>

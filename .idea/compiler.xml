@@ -8,6 +8,7 @@
         <outputRelativeToContentRoot value="true" />
         <module name="cloud-mall-user" />
         <module name="cloud-mall-common" />
+        <module name="cloud-mall-cart-order" />
         <module name="cloud-mall-zuul" />
         <module name="cloud-mall-category-product" />
         <module name="cloud-mall-eureka-server" />
@@ -16,6 +17,7 @@
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="cloud-mall-cart-order" options="-parameters" />
       <module name="cloud-mall-category-product" options="-parameters" />
       <module name="cloud-mall-common" options="-parameters" />
       <module name="cloud-mall-eureka-server" options="-parameters" />

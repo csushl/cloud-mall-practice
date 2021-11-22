@@ -10,10 +10,7 @@ import com.imooc.cloud.mall.practice.user.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
@@ -132,5 +129,17 @@ public class UserController {
     @ResponseBody
     public Boolean checkAdminRole(@RequestBody User user) {
         return userService.checkAdminRole(user);
+    }
+
+    /**
+     * 获取当前登录的User对象
+     * @param session
+     * @return
+     */
+    @GetMapping("/getUser")
+    @ResponseBody
+    public User getUser(HttpSession session) {
+        User currentUser = (User) session.getAttribute(Constant.IMOOC_MALL_USER);
+        return currentUser;
     }
 }
