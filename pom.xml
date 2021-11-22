@@ -13,6 +13,7 @@
         <module>cloud-mall-user</module>
         <module>cloud-mall-common</module>
         <module>cloud-mall-zuul</module>
+        <module>cloud-mall-category-product</module>
     </modules>
 
     <properties>
