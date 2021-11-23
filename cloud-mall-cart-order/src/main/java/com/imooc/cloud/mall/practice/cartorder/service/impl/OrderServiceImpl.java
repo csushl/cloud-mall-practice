@@ -4,31 +4,33 @@ import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import com.google.zxing.WriterException;
 import com.imooc.cloud.mall.practice.cartorder.feign.ProductFeignClient;
-import com.imooc.cloud.mall.practice.cartorder.feign.UserFeignClient;
+import com.imooc.cloud.mall.practice.cartorder.filter.UserInfoFilter;
 import com.imooc.cloud.mall.practice.cartorder.model.dao.CartMapper;
 import com.imooc.cloud.mall.practice.cartorder.model.dao.OrderItemMapper;
 import com.imooc.cloud.mall.practice.cartorder.model.dao.OrderMapper;
 import com.imooc.cloud.mall.practice.cartorder.model.pojo.Order;
 import com.imooc.cloud.mall.practice.cartorder.model.pojo.OrderItem;
+import com.imooc.cloud.mall.practice.cartorder.model.pojo.Product;
 import com.imooc.cloud.mall.practice.cartorder.model.request.CreateOrderReq;
 import com.imooc.cloud.mall.practice.cartorder.model.vo.CartVO;
 import com.imooc.cloud.mall.practice.cartorder.model.vo.OrderItemVO;
 import com.imooc.cloud.mall.practice.cartorder.model.vo.OrderVO;
+import com.imooc.cloud.mall.practice.cartorder.mq.MsgSender;
 import com.imooc.cloud.mall.practice.cartorder.service.CartService;
 import com.imooc.cloud.mall.practice.cartorder.service.OrderService;
 import com.imooc.cloud.mall.practice.cartorder.util.OrderCodeFactory;
-import com.imooc.cloud.mall.practice.categoryproduct.model.pojo.Product;
 import com.imooc.cloud.mall.practice.common.common.Constant.Cart;
 import com.imooc.cloud.mall.practice.common.common.Constant.OrderStatusEnum;
 import com.imooc.cloud.mall.practice.common.common.Constant.SaleStatus;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallException;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallExceptionEnum;
 import com.imooc.cloud.mall.practice.common.util.QRCodeGenerator;
+import io.seata.spring.annotation.GlobalTransactional;
+import org.apache.commons.lang.time.DateUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -69,16 +71,33 @@ public class OrderServiceImpl implements OrderService {
     @Value("${file.upload.dir}")
     String FILE_UPLOAD_DIR;
 
+
     @Autowired
-    UserFeignClient userFeignClient;
+    MsgSender msgSender;
 
     //数据库事务
-    @Transactional(rollbackFor = Exception.class)
+    /**
+     * CREATE TABLE `undo_log` (
+     *   `id` bigint(20) NOT NULL AUTO_INCREMENT,
+     *   `branch_id` bigint(20) NOT NULL,
+     *   `xid` varchar(100) NOT NULL,
+     *   `context` varchar(128) NOT NULL,
+     *   `rollback_info` longblob NOT NULL,
+     *   `log_status` int(11) NOT NULL,
+     *   `log_created` datetime NOT NULL,
+     *   `log_modified` datetime NOT NULL,
+     *   `ext` varchar(100) DEFAULT NULL,
+     *   PRIMARY KEY (`id`),
+     *   UNIQUE KEY `ux_undo_log` (`xid`,`branch_id`)
+     * ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+     */
+//    @Transactional(rollbackFor = Exception.class)
+    @GlobalTransactional
     @Override
     public String create(CreateOrderReq createOrderReq) {
 
         //拿到用户ID
-        Integer userId = userFeignClient.getUser().getId();
+        Integer userId = UserInfoFilter.userThreadLocal.get().getId();
 
         //从购物车查找已经勾选的商品
         List<CartVO> cartVOList = cartService.list(userId);
@@ -192,7 +211,7 @@ public class OrderServiceImpl implements OrderService {
             throw new ImoocMallException(ImoocMallExceptionEnum.NO_ORDER);
         }
         //订单存在，需要判断所属
-        Integer userId = userFeignClient.getUser().getId();
+        Integer userId = UserInfoFilter.userThreadLocal.get().getId();
         if (!order.getUserId().equals(userId)) {
             throw new ImoocMallException(ImoocMallExceptionEnum.NOT_YOUR_ORDER);
         }
@@ -219,7 +238,7 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public PageInfo listForCustomer(Integer pageNum, Integer pageSize) {
-        Integer userId = userFeignClient.getUser().getId();
+        Integer userId = UserInfoFilter.userThreadLocal.get().getId();
         PageHelper.startPage(pageNum, pageSize);
         List<Order> orderList = orderMapper.selectForCustomer(userId);
         List<OrderVO> orderVOList = orderListToOrderVOList(orderList);
@@ -239,7 +258,7 @@ public class OrderServiceImpl implements OrderService {
     }
 
     @Override
-    public void cancel(String orderNo) {
+    public void cancel(String orderNo, Boolean isFromSystem) {
         Order order = orderMapper.selectByOrderNo(orderNo);
         //查不到订单，报错
         if (order == null) {
@@ -247,10 +266,12 @@ public class OrderServiceImpl implements OrderService {
         }
         //验证用户身份
         //订单存在，需要判断所属
-        Integer userId = userFeignClient.getUser()
-                .getId();
-        if (!order.getUserId().equals(userId)) {
-            throw new ImoocMallException(ImoocMallExceptionEnum.NOT_YOUR_ORDER);
+        if (!isFromSystem) {
+            Integer userId = UserInfoFilter.userThreadLocal.get()
+                    .getId();
+            if (!order.getUserId().equals(userId)) {
+                throw new ImoocMallException(ImoocMallExceptionEnum.NOT_YOUR_ORDER);
+            }
         }
         if (order.getOrderStatus().equals(OrderStatusEnum.NOT_PAID.getCode())) {
             order.setOrderStatus(OrderStatusEnum.CANCELED.getCode());
@@ -258,6 +279,16 @@ public class OrderServiceImpl implements OrderService {
             orderMapper.updateByPrimaryKeySelective(order);
         } else {
             throw new ImoocMallException(ImoocMallExceptionEnum.WRONG_ORDER_STATUS);
+        }
+        //恢复商品库存
+        //获取订单对应的orderItemList
+        List<OrderItem> orderItemList = orderItemMapper.selectByOrderNo(order.getOrderNo());
+        for (int i = 0; i < orderItemList.size(); i++) {
+            OrderItem orderItem = orderItemList.get(i);
+            Product product = productFeignClient.detailForFeign(orderItem.getProductId());
+            int stock = product.getStock() + orderItem.getQuantity();
+            productFeignClient.updateStock(orderItem.getProductId(), stock);
+//            msgSender.send(product.getId(), stock);
         }
     }
 
@@ -333,8 +364,8 @@ public class OrderServiceImpl implements OrderService {
             throw new ImoocMallException(ImoocMallExceptionEnum.NO_ORDER);
         }
         //如果是普通用户，就要校验订单的所属
-        if (userFeignClient.getUser().getRole().equals(1) && !order.getUserId()
-                .equals(userFeignClient.getUser().getId())) {
+        if (UserInfoFilter.userThreadLocal.get().getRole().equals(1) && !order.getUserId()
+                .equals(UserInfoFilter.userThreadLocal.get().getId())) {
             throw new ImoocMallException(ImoocMallExceptionEnum.NOT_YOUR_ORDER);
         }
         //发货后可以完结订单
@@ -345,5 +376,14 @@ public class OrderServiceImpl implements OrderService {
         } else {
             throw new ImoocMallException(ImoocMallExceptionEnum.WRONG_ORDER_STATUS);
         }
+    }
+
+    @Override
+    public List<Order> getUnpaidOrders() {
+        Date curTime = new Date();
+        Date endTime = DateUtils.addDays(curTime, -1);
+        Date begTime = DateUtils.addMinutes(endTime, -5);
+        List<Order> unpaidOrders = orderMapper.selectUnpaidOrders(begTime, endTime);
+        return unpaidOrders;
     }
 }

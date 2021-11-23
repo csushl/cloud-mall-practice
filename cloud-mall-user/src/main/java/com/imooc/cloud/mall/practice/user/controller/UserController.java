@@ -5,14 +5,19 @@ import com.imooc.cloud.mall.practice.common.common.ApiRestResponse;
 import com.imooc.cloud.mall.practice.common.common.Constant;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallException;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallExceptionEnum;
+
+import com.imooc.cloud.mall.practice.user.filter.UserInfoFilter;
 import com.imooc.cloud.mall.practice.user.model.pojo.User;
 import com.imooc.cloud.mall.practice.user.service.UserService;
+import javax.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 描述：     用户控制器
@@ -29,7 +34,7 @@ public class UserController {
     @PostMapping("/register")
     @ResponseBody
     public ApiRestResponse register(@RequestParam("userName") String userName,
-                                    @RequestParam("password") String password) throws ImoocMallException {
+            @RequestParam("password") String password) throws ImoocMallException {
         if (StringUtils.isEmpty(userName)) {
             return ApiRestResponse.error(ImoocMallExceptionEnum.NEED_USER_NAME);
         }
@@ -50,7 +55,7 @@ public class UserController {
     @PostMapping("/login")
     @ResponseBody
     public ApiRestResponse login(@RequestParam("userName") String userName,
-                                 @RequestParam("password") String password, HttpSession session)
+            @RequestParam("password") String password, HttpSession session)
             throws ImoocMallException {
         if (StringUtils.isEmpty(userName)) {
             return ApiRestResponse.error(ImoocMallExceptionEnum.NEED_USER_NAME);
@@ -72,10 +77,11 @@ public class UserController {
     @ResponseBody
     public ApiRestResponse updateUserInfo(HttpSession session, @RequestParam String signature)
             throws ImoocMallException {
-        User currentUser = (User) session.getAttribute(Constant.IMOOC_MALL_USER);
-        if (currentUser == null) {
-            return ApiRestResponse.error(ImoocMallExceptionEnum.NEED_LOGIN);
-        }
+//        User currentUser = (User) session.getAttribute(Constant.IMOOC_MALL_USER);
+//        if (currentUser == null) {
+//            return ApiRestResponse.error(ImoocMallExceptionEnum.NEED_LOGIN);
+//        }
+        User currentUser = UserInfoFilter.userThreadLocal.get();
         User user = new User();
         user.setId(currentUser.getId());
         user.setPersonalizedSignature(signature);
@@ -99,7 +105,7 @@ public class UserController {
     @PostMapping("/adminLogin")
     @ResponseBody
     public ApiRestResponse adminLogin(@RequestParam("userName") String userName,
-                                      @RequestParam("password") String password, HttpSession session)
+            @RequestParam("password") String password, HttpSession session)
             throws ImoocMallException {
         if (StringUtils.isEmpty(userName)) {
             return ApiRestResponse.error(ImoocMallExceptionEnum.NEED_USER_NAME);
@@ -122,8 +128,6 @@ public class UserController {
 
     /**
      * 校验是否是管理员
-     * @param user
-     * @return
      */
     @PostMapping("/checkAdminRole")
     @ResponseBody
@@ -133,8 +137,6 @@ public class UserController {
 
     /**
      * 获取当前登录的User对象
-     * @param session
-     * @return
      */
     @GetMapping("/getUser")
     @ResponseBody

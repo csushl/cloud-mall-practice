@@ -1,9 +1,11 @@
 package com.imooc.cloud.mall.practice.user.model.pojo;
 
+
 import java.io.Serializable;
 import java.util.Date;
 
 public class User implements Serializable {
+
     private Integer id;
 
     private String username;
@@ -47,7 +49,8 @@ public class User implements Serializable {
     }
 
     public void setPersonalizedSignature(String personalizedSignature) {
-        this.personalizedSignature = personalizedSignature == null ? null : personalizedSignature.trim();
+        this.personalizedSignature =
+                personalizedSignature == null ? null : personalizedSignature.trim();
     }
 
     public Integer getRole() {

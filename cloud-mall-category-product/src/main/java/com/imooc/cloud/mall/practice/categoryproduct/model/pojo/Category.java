@@ -4,6 +4,7 @@ import java.util.Date;
 
 //plain ordinary java object
 public class Category {
+
     private Integer id;
 
     private String name;

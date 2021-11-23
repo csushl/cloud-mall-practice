@@ -3,6 +3,7 @@ package com.imooc.cloud.mall.practice.categoryproduct.model.pojo;
 import java.util.Date;
 
 public class Product {
+
     private Integer id;
 
     private String name;

@@ -2,14 +2,13 @@ package com.imooc.cloud.mall.practice.cartorder.filter;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import java.util.Enumeration;
+import javax.servlet.http.HttpServletRequest;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import java.util.Enumeration;
 
 /**
  * 描述：     Feign请求拦截器

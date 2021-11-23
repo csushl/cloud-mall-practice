@@ -7,11 +7,10 @@ import com.imooc.cloud.mall.practice.common.exception.ImoocMallExceptionEnum;
 import com.imooc.cloud.mall.practice.user.model.dao.UserMapper;
 import com.imooc.cloud.mall.practice.user.model.pojo.User;
 import com.imooc.cloud.mall.practice.user.service.UserService;
+import java.security.NoSuchAlgorithmException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.security.NoSuchAlgorithmException;
 
 /**
  * 描述：     UserService实现类

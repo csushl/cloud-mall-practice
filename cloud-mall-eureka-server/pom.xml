@@ -16,14 +16,7 @@
     <name>
         cloud-mall-eureka-server
     </name>
-
     <description>Spring Cloud Eureka Server</description>
-
-
-    <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
-    </properties>
 
     <dependencies>
         <dependency>
@@ -40,5 +33,4 @@
             </plugin>
         </plugins>
     </build>
-
 </project>

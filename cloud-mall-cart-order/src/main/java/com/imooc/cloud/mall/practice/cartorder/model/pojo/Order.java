@@ -3,6 +3,7 @@ package com.imooc.cloud.mall.practice.cartorder.model.pojo;
 import java.util.Date;
 
 public class Order {
+
     private Integer id;
 
     private String orderNo;

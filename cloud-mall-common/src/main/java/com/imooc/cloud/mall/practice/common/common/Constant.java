@@ -3,7 +3,6 @@ package com.imooc.cloud.mall.practice.common.common;
 import com.google.common.collect.Sets;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallException;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallExceptionEnum;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.Set;
@@ -17,16 +16,10 @@ public class Constant {
     public static final String IMOOC_MALL_USER = "imooc_mall_user";
     public static final String SALT = "8svbsvjkweDF,.03[";
 
-    public static String FILE_UPLOAD_DIR;
-
-    @Value("${file.upload.dir}")
-    public void setFileUploadDir(String fileUploadDir) {
-        FILE_UPLOAD_DIR = fileUploadDir;
-    }
 
     public interface ProductListOrderBy {
 
-        Set<String> PRICE_ORDER_ENUM = Sets.newHashSet("price asc","price desc");
+        Set<String> PRICE_ORDER_ENUM = Sets.newHashSet("price desc", "price asc");
     }
 
     public interface SaleStatus {
@@ -81,4 +74,10 @@ public class Constant {
             this.code = code;
         }
     }
+
+    public static final String USER_ID = "user_id";
+    public static final String USER_NAME = "user_name";
+    public static final String USER_ROLE = "user_role";
+
+    public static final Integer ADMIN_ROLE =2;
 }

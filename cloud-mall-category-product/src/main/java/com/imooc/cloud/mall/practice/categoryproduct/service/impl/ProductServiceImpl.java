@@ -2,6 +2,7 @@ package com.imooc.cloud.mall.practice.categoryproduct.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+
 import com.imooc.cloud.mall.practice.categoryproduct.model.dao.ProductMapper;
 import com.imooc.cloud.mall.practice.categoryproduct.model.pojo.Product;
 import com.imooc.cloud.mall.practice.categoryproduct.model.query.ProductListQuery;
@@ -13,13 +14,12 @@ import com.imooc.cloud.mall.practice.categoryproduct.service.ProductService;
 import com.imooc.cloud.mall.practice.common.common.Constant.ProductListOrderBy;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallException;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallExceptionEnum;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * 描述：     商品服务实现类

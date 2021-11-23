@@ -4,9 +4,9 @@ package com.imooc.cloud.mall.practice.cartorder.service.impl;
 import com.imooc.cloud.mall.practice.cartorder.feign.ProductFeignClient;
 import com.imooc.cloud.mall.practice.cartorder.model.dao.CartMapper;
 import com.imooc.cloud.mall.practice.cartorder.model.pojo.Cart;
+import com.imooc.cloud.mall.practice.cartorder.model.pojo.Product;
 import com.imooc.cloud.mall.practice.cartorder.model.vo.CartVO;
 import com.imooc.cloud.mall.practice.cartorder.service.CartService;
-import com.imooc.cloud.mall.practice.categoryproduct.model.pojo.Product;
 import com.imooc.cloud.mall.practice.common.common.Constant;
 import com.imooc.cloud.mall.practice.common.common.Constant.SaleStatus;
 import com.imooc.cloud.mall.practice.common.exception.ImoocMallException;
@@ -36,6 +36,7 @@ public class CartServiceImpl implements CartService {
         }
         return cartVOS;
     }
+
     @Override
     public List<CartVO> add(Integer userId, Integer productId, Integer count) {
         validProduct(productId, count);
@@ -117,7 +118,7 @@ public class CartServiceImpl implements CartService {
             throw new ImoocMallException(ImoocMallExceptionEnum.UPDATE_FAILED);
         } else {
             //这个商品已经在购物车里了，则可以选中/不选中
-            cartMapper.selectOrNot(userId,productId,selected);
+            cartMapper.selectOrNot(userId, productId, selected);
         }
         return this.list(userId);
     }

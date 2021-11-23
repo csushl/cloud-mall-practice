@@ -47,7 +47,7 @@ public class OrderController {
     @PostMapping("order/cancel")
     @ApiOperation("前台取消订单")
     public ApiRestResponse cancel(@RequestParam String orderNo) {
-        orderService.cancel(orderNo);
+        orderService.cancel(orderNo, false);
         return ApiRestResponse.success();
     }
 

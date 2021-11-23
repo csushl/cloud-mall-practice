@@ -7,15 +7,21 @@ import com.imooc.cloud.mall.practice.categoryproduct.model.request.UpdateCategor
 import com.imooc.cloud.mall.practice.categoryproduct.model.vo.CategoryVO;
 import com.imooc.cloud.mall.practice.categoryproduct.service.CategoryService;
 import com.imooc.cloud.mall.practice.common.common.ApiRestResponse;
+import com.imooc.cloud.mall.practice.common.common.Constant;
+import com.imooc.cloud.mall.practice.common.exception.ImoocMallExceptionEnum;
+
 import io.swagger.annotations.ApiOperation;
+import java.util.List;
+import javax.servlet.http.HttpSession;
+import javax.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
-import javax.validation.Valid;
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 描述：     目录Controller
@@ -35,7 +41,6 @@ public class CategoryController {
     @ResponseBody
     public ApiRestResponse addCategory(HttpSession session,
             @Valid @RequestBody AddCategoryReq addCategoryReq) {
-
         categoryService.add(addCategoryReq);
         return ApiRestResponse.success();
     }

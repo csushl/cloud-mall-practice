@@ -1,6 +1,7 @@
 package com.imooc.cloud.mall.practice.cartorder.model.vo;
 
 public class OrderItemVO {
+
     private String orderNo;
 
     private Integer productId;

@@ -1,6 +1,7 @@
 package com.imooc.cloud.mall.practice.categoryproduct.controller;
 
 import com.github.pagehelper.PageInfo;
+
 import com.imooc.cloud.mall.practice.categoryproduct.model.pojo.Product;
 import com.imooc.cloud.mall.practice.categoryproduct.model.request.ProductListReq;
 import com.imooc.cloud.mall.practice.categoryproduct.service.ProductService;
@@ -28,7 +29,7 @@ public class ProductController {
         return ApiRestResponse.success(product);
     }
 
-    @ApiOperation("商品详情")
+    @ApiOperation("商品列表")
     @GetMapping("product/list")
     public ApiRestResponse list(ProductListReq productListReq) {
         PageInfo list = productService.list(productListReq);
